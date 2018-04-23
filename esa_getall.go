@@ -11,6 +11,6 @@ func main() {
 	apikey := os.Getenv("ESA_API_KEY")
 	client := esa.NewClient(apikey)
 
-	posts := get_posts(client, team, user)
-	write_posts(posts)
+	posts := getPosts(client, team, user)
+	writePosts(posts)
 }

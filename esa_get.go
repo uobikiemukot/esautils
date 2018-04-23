@@ -20,6 +20,6 @@ func main() {
 		panic("strconv.Atoi Failed" + err.Error())
 	}
 
-	post := get_post(client, team, post_num)
-	write_post(post)
+	post := getPost(client, team, post_num)
+	writePost(post)
 }

@@ -14,6 +14,6 @@ func main() {
 		panic("usage: ./esa_create Category Name")
 	}
 
-	post := new_post(client, team, os.Args[1], os.Args[2])
-	write_post(post)
+	post := newPost(client, team, os.Args[1], os.Args[2])
+	writePost(post)
 }

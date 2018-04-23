@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func get_post(client *esa.Client, team string, id int) *esa.PostResponse {
+func getPost(client *esa.Client, team string, id int) *esa.PostResponse {
 	post_res, err := client.Post.GetPost(team, id)
 	if err != nil {
 		panic("client.Post.GetPost Failed: " + err.Error())
@@ -19,7 +19,7 @@ func get_post(client *esa.Client, team string, id int) *esa.PostResponse {
 	return post_res
 }
 
-func get_posts(client *esa.Client, team string, user string) []esa.PostResponse {
+func getPosts(client *esa.Client, team string, user string) []esa.PostResponse {
 	var posts []esa.PostResponse
 
 	query := url.Values{}
@@ -45,7 +45,7 @@ func get_posts(client *esa.Client, team string, user string) []esa.PostResponse 
 	return posts
 }
 
-func read_array(path string) []string {
+func readArray(path string) []string {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		panic("ioutil.ReadFile Failed: " + err.Error())
@@ -53,7 +53,7 @@ func read_array(path string) []string {
 	return strings.Split(string(data), "\n")
 }
 
-func read_bool(path string) bool {
+func readBool(path string) bool {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		panic("ioutil.ReadFile Failed: " + err.Error())
@@ -66,7 +66,7 @@ func read_bool(path string) bool {
 	return boolean
 }
 
-func read_string(path string) string {
+func readString(path string) string {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		panic("ioutil.ReadFile Failed: " + err.Error())
@@ -74,19 +74,19 @@ func read_string(path string) string {
 	return string(data)
 }
 
-func update_post(client *esa.Client, team string, path string) {
+func updatePost(client *esa.Client, team string, path string) {
 	post_id, err := strconv.Atoi(filepath.Base(path))
 	if err != nil {
 		panic("strconv.Atoi Failed: " + err.Error())
 	}
 
 	post := esa.Post{
-		BodyMd:   read_string(path + "/BodyMd"),
-		Category: read_string(path + "/Category"),
-		Message:  read_string(path + "/Message"),
-		Name:     read_string(path + "/Name"),
-		Tags:     read_array(path + "/Tags"),
-		Wip:      read_bool(path + "/Wip"),
+		BodyMd:   readString(path + "/BodyMd"),
+		Category: readString(path + "/Category"),
+		Message:  readString(path + "/Message"),
+		Name:     readString(path + "/Name"),
+		Tags:     readArray(path + "/Tags"),
+		Wip:      readBool(path + "/Wip"),
 	}
 
 	if _, err := client.Post.Update(team, post_id, post); err != nil {
@@ -94,7 +94,7 @@ func update_post(client *esa.Client, team string, path string) {
 	}
 }
 
-func new_post(client *esa.Client, team string, category string, name string) *esa.PostResponse {
+func newPost(client *esa.Client, team string, category string, name string) *esa.PostResponse {
 	post := esa.Post{
 		BodyMd:   "",
 		Category: category,
@@ -111,41 +111,41 @@ func new_post(client *esa.Client, team string, category string, name string) *es
 	return post_res
 }
 
-func write_bool(path string, data bool) {
+func writeBool(path string, data bool) {
 	if err := ioutil.WriteFile(path, []byte(fmt.Sprint(data)), 0644); err != nil {
 		panic("ioutil.WriteFile Failed: " + path + err.Error())
 	}
 }
 
-func write_array(path string, data []string) {
+func writeArray(path string, data []string) {
 	if err := ioutil.WriteFile(path, []byte(strings.Join(data, "\n")), 0644); err != nil {
 		panic("ioutil.WriteFile Failed: " + path + err.Error())
 	}
 }
 
-func write_string(path string, data string) {
+func writeString(path string, data string) {
 	if err := ioutil.WriteFile(path, []byte(data), 0644); err != nil {
 		panic("ioutil.WriteFile Failed: " + path + err.Error())
 	}
 }
 
-func write_post(post_res *esa.PostResponse) {
+func writePost(post_res *esa.PostResponse) {
 	prefix := fmt.Sprint(post_res.Number)
 
 	if err := os.MkdirAll(prefix, 0755); err != nil {
 		panic("os.Mkdir Failed: " + err.Error())
 	}
 
-	write_string(prefix+"/BodyMd", post_res.BodyMd)
-	write_string(prefix+"/Category", post_res.Category)
-	write_string(prefix+"/Message", post_res.Message)
-	write_string(prefix+"/Name", post_res.Name)
-	write_array(prefix+"/Tags", post_res.Tags)
-	write_bool(prefix+"/Wip", post_res.Wip)
+	writeString(prefix+"/BodyMd", post_res.BodyMd)
+	writeString(prefix+"/Category", post_res.Category)
+	writeString(prefix+"/Message", post_res.Message)
+	writeString(prefix+"/Name", post_res.Name)
+	writeArray(prefix+"/Tags", post_res.Tags)
+	writeBool(prefix+"/Wip", post_res.Wip)
 }
 
-func write_posts(posts []esa.PostResponse) {
+func writePosts(posts []esa.PostResponse) {
 	for _, post := range posts {
-		write_post(&post)
+		writePost(&post)
 	}
 }

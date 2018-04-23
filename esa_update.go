@@ -14,5 +14,5 @@ func main() {
 		panic("usage: ./esa_push PostDir")
 	}
 
-	update_post(client, team, os.Args[1])
+	updatePost(client, team, os.Args[1])
 }
