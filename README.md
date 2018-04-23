@@ -7,9 +7,12 @@ Last update: Mon Apr 23 07:42:51 UTC 2018
 Command line tools for [esa.io](https://esa.io/).
 Based on [go-esa](https://github.com/upamune/go-esa) library.
 
-esa_get and esa_new commands create following files.
+`esa_get` and `esa_new` commands create following files.
 
 ~~~bash
+$ esa_new "path/to/category" "post title"
+$ ls -F
+$ 352/
 $ tree 352/
 352/
 ├── BodyMd
@@ -21,35 +24,42 @@ $ tree 352/
 ~~~
 
 You can edit these files in your local.
-then esa_update posts local updates to server.
+
+`esa_update` posts local updates to server.
+
+~~~
+$ vi 352/BodyMd
+(edit...)
+$ esa_update 352
+~~~
 
 ## configuration
 
 set these environment variables:
 
-- ESA_API_KEY
+- `ESA_API_KEY`
   - application token
-- ESA_TEAM
+- `ESA_TEAM`
   - your team
-- ESA_USER
+- `ESA_USER`
   - your user name
 
 ## usage
 
-- esa_new CATEGORY NAME
+- `esa_new` CATEGORY NAME
   - create new post
   - args
     - CATEGORY: /path/to/category/
     - NAME: post title
-- esa_update NUMBER
+- `esa_update` NUMBER
   - update post
   - args
     - NUMBER: post number
-- esa_get NUMBER
+- `esa_get` NUMBER
   - get specified posts
   - args
     - NUMBER: post number
-- esa_getall
+- `esa_getall`
   - get all posts related to your user name
 
 ## license
