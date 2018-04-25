@@ -1,6 +1,6 @@
-# esa_cli
+# esautils
 
-Last update: Mon Apr 23 07:42:51 UTC 2018
+Last update: Wed Apr 25 06:03:17 UTC 2018
 
 ## description
 
@@ -61,6 +61,36 @@ set these environment variables:
     - NUMBER: post number
 - `esa_getall`
   - get all posts related to your user name
+
+## sample script using fswatch (esa_autoupdate.sh)
+
+~~~
+#!/bin/bash
+fswatch --one-per-batch -d -0 . | while read -d "" path; do
+  POST_NUM=`basename $(dirname $path)`
+  PATTERN="[0-9]+"
+
+  diff $POST_NUM/BodyMd{.draft,} && continue
+  cp $POST_NUM/BodyMd{.draft,}
+
+  if [[ $POST_NUM =~ $PATTERN ]]; then
+    esa_update $POST_NUM
+  fi
+done
+~~~
+
+use like this:
+
+~~~
+$ esa_new "some/category" "some title"
+$ ls -F
+$ 222/
+$ cp 222/BodyMd{,.draft}
+$ nohup esa_autoupdate.sh > /dev/null 2>&1 &
+$ vi 222/BodyMd.draft
+(autoupdate post every time you save)
+~~~
+
 
 ## license
 The MIT License (MIT)
