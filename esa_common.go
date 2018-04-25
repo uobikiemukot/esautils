@@ -11,15 +11,15 @@ import (
 	"strings"
 )
 
-func getPost(client *esa.Client, team string, id int) *esa.PostResponse {
-	post_res, err := client.Post.GetPost(team, id)
+func getPost(client *esa.Client, team string, id int) (*esa.PostResponse, error) {
+	post, err := client.Post.GetPost(team, id)
 	if err != nil {
-		panic("client.Post.GetPost Failed: " + err.Error())
+		return nil, err
 	}
-	return post_res
+	return post, nil
 }
 
-func getPosts(client *esa.Client, team string, user string) []esa.PostResponse {
+func getPosts(client *esa.Client, team string, user string) ([]esa.PostResponse, error) {
 	var posts []esa.PostResponse
 
 	query := url.Values{}
@@ -30,11 +30,11 @@ func getPosts(client *esa.Client, team string, user string) []esa.PostResponse {
 	for {
 		res, err := client.Post.GetPosts(team, query)
 		if err != nil {
-			panic("client.Post.GetPosts Failed: " + err.Error())
+			return nil, err
 		}
 
-		for _, post := range res.Posts {
-			posts = append(posts, post)
+		for _, p := range res.Posts {
+			posts = append(posts, p)
 		}
 
 		if res.NextPage == nil {
@@ -42,13 +42,14 @@ func getPosts(client *esa.Client, team string, user string) []esa.PostResponse {
 		}
 		query.Set("page", fmt.Sprint(res.NextPage))
 	}
-	return posts
+	return posts, nil
 }
 
 func readArray(path string) []string {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		panic("ioutil.ReadFile Failed: " + err.Error())
+		fmt.Fprintf(os.Stderr, "ioutil.ReadFile Failed: %v\n", err)
+		return []string{}
 	}
 	return strings.Split(string(data), "\n")
 }
@@ -56,28 +57,32 @@ func readArray(path string) []string {
 func readBool(path string) bool {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		panic("ioutil.ReadFile Failed: " + err.Error())
+		fmt.Fprintf(os.Stderr, "ioutil.ReadFile Failed: %v\n", err)
+		return true
 	}
 
-	boolean, err := strconv.ParseBool(string(data))
+	b, err := strconv.ParseBool(string(data))
 	if err != nil {
-		panic("strconv.ParseBool Failed: " + err.Error())
+		fmt.Fprintf(os.Stderr, "ioutil.ReadFile Failed: %v\n", err)
+		return true
 	}
-	return boolean
+	return b
 }
 
 func readString(path string) string {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		panic("ioutil.ReadFile Failed: " + err.Error())
+		fmt.Fprintf(os.Stderr, "ioutil.ReadFile Failed: %v\n", err)
+		return ""
 	}
 	return string(data)
 }
 
-func updatePost(client *esa.Client, team string, path string) {
-	post_id, err := strconv.Atoi(filepath.Base(path))
+func updatePost(client *esa.Client, team string, path string) error {
+
+	id, err := strconv.Atoi(filepath.Base(path))
 	if err != nil {
-		panic("strconv.Atoi Failed: " + err.Error())
+		return err
 	}
 
 	post := esa.Post{
@@ -89,12 +94,14 @@ func updatePost(client *esa.Client, team string, path string) {
 		Wip:      readBool(path + "/Wip"),
 	}
 
-	if _, err := client.Post.Update(team, post_id, post); err != nil {
-		panic("client.Post.Update Failed: " + err.Error())
+	if _, err := client.Post.Update(team, id, post); err != nil {
+		return err
 	}
+
+	return nil
 }
 
-func newPost(client *esa.Client, team string, category string, name string) *esa.PostResponse {
+func newPost(client *esa.Client, team string, category string, name string) (*esa.PostResponse, error) {
 	post := esa.Post{
 		BodyMd:   "",
 		Category: category,
@@ -104,36 +111,36 @@ func newPost(client *esa.Client, team string, category string, name string) *esa
 		Wip:      true,
 	}
 
-	post_res, err := client.Post.Create(team, post)
+	res, err := client.Post.Create(team, post)
 	if err != nil {
-		panic("cilent.Post.Create Failed: " + err.Error())
+		return nil, err
 	}
-	return post_res
+	return res, nil
 }
 
 func writeBool(path string, data bool) {
 	if err := ioutil.WriteFile(path, []byte(fmt.Sprint(data)), 0644); err != nil {
-		panic("ioutil.WriteFile Failed: " + path + err.Error())
+		fmt.Fprintf(os.Stderr, "ioutil.WriteFile Failed: %v\n", err)
 	}
 }
 
 func writeArray(path string, data []string) {
 	if err := ioutil.WriteFile(path, []byte(strings.Join(data, "\n")), 0644); err != nil {
-		panic("ioutil.WriteFile Failed: " + path + err.Error())
+		fmt.Fprintf(os.Stderr, "ioutil.WriteFile Failed: %v\n", err)
 	}
 }
 
 func writeString(path string, data string) {
 	if err := ioutil.WriteFile(path, []byte(data), 0644); err != nil {
-		panic("ioutil.WriteFile Failed: " + path + err.Error())
+		fmt.Fprintf(os.Stderr, "ioutil.WriteFile Failed: %v\n", err)
 	}
 }
 
-func writePost(post_res *esa.PostResponse) {
+func writePost(post_res *esa.PostResponse) error {
 	prefix := fmt.Sprint(post_res.Number)
 
 	if err := os.MkdirAll(prefix, 0755); err != nil {
-		panic("os.Mkdir Failed: " + err.Error())
+		return err
 	}
 
 	writeString(prefix+"/BodyMd", post_res.BodyMd)
@@ -142,10 +149,15 @@ func writePost(post_res *esa.PostResponse) {
 	writeString(prefix+"/Name", post_res.Name)
 	writeArray(prefix+"/Tags", post_res.Tags)
 	writeBool(prefix+"/Wip", post_res.Wip)
+
+	return nil
 }
 
-func writePosts(posts []esa.PostResponse) {
+func writePosts(posts []esa.PostResponse) error {
 	for _, post := range posts {
-		writePost(&post)
+		if err := writePost(&post); err != nil {
+			return err
+		}
 	}
+	return nil
 }

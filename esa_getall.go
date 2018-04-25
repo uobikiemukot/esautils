@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/upamune/go-esa/esa"
 	"os"
 )
@@ -11,6 +12,16 @@ func main() {
 	apikey := os.Getenv("ESA_API_KEY")
 	client := esa.NewClient(apikey)
 
-	posts := getPosts(client, team, user)
-	writePosts(posts)
+	posts, err := getPosts(client, team, user)
+	if err != err {
+		fmt.Fprintf(os.Stderr, "getPosts Failed: %v\n", err)
+		os.Exit(1)
+	}
+
+	if err = writePosts(posts); err != nil {
+		fmt.Fprintf(os.Stderr, "writePosts Failed: %v\n", err)
+		os.Exit(2)
+	}
+
+	os.Exit(0)
 }
