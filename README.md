@@ -1,6 +1,7 @@
 # esautils
 
-Last update: Wed Apr 25 06:03:17 UTC 2018
+Last update: Thu May 17 16:23:23 JST 2018
+
 
 ## description
 
@@ -23,9 +24,9 @@ $ tree 352/
 └── Wip
 ~~~
 
-You can edit these files in your local.
+You can edit these files in your local with your favorite editor.
 
-`esa_update` posts local updates to server.
+`esa_update` uploads local changes to server.
 
 ~~~
 $ vi 352/BodyMd
@@ -55,6 +56,10 @@ set these environment variables:
   - update post
   - args
     - NUMBER: post number
+- `esa_attach` ATTACHMENT
+  - upload attachment and return url
+  - args
+    - ATTACHMENT: path of attachment file
 - `esa_get` NUMBER
   - get specified posts
   - args
