@@ -12,7 +12,7 @@ func main() {
 	client := esa.NewClient(apikey)
 
 	if len(os.Args) < 2 {
-		fmt.Fprintf(os.Stderr, "usage: ./esa_upload ImageFile")
+		fmt.Fprintf(os.Stderr, "usage: ./esa_upload File")
 		os.Exit(1)
 	}
 
