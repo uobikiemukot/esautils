@@ -27,5 +27,6 @@ func main() {
 		os.Exit(3)
 	}
 
+	fmt.Println(post.Number)
 	os.Exit(0)
 }
