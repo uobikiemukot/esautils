@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/upamune/go-esa/esa"
+	"github.com/uobikiemukot/go-esa/esa"
 	"io/ioutil"
 	"net/url"
 	"os"

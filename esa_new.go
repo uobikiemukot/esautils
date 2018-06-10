@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/upamune/go-esa/esa"
+	"github.com/uobikiemukot/go-esa/esa"
 	"os"
 )
 
@@ -27,5 +27,6 @@ func main() {
 		os.Exit(3)
 	}
 
+	fmt.Println(post.Number)
 	os.Exit(0)
 }
