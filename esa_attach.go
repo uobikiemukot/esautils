@@ -21,6 +21,7 @@ func main() {
 		fmt.Printf("UploadAttachmentFile Failed: %v\n", err)
 		os.Exit(2)
 	}
+
 	fmt.Println(url)
 	os.Exit(0)
 }
